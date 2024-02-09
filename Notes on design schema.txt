@@ -1,0 +1,47 @@
+1. Change Requests Table (for employees):
+
+ChangeRequestID (Primary Key)
+Title
+Description
+RequestedBy (Foreign Key referencing Users table)
+Status (e.g., Draft, Submitted, Approved, Rejected, Implemented, Closed)
+Priority
+RequestedDate
+PlannedStartDate
+PlannedEndDate
+ActualStartDate
+ActualEndDate
+ApprovalStatus (e.g., Approved, Rejected)
+ApproverID (Foreign Key referencing Users table - ID of the admin who performed the approval)
+ApprovalDateTime (Timestamp indicating when the approval or rejection was made)
+
+2. Change Approval Table (for administrators):
+
+ApprovalID: Unique identifier for each approval entry.
+ChangeRequestID: Reference to the associated change request.
+ApproverID: Reference to the admin performing the approval.
+ApprovalStatus: Current status of the approval process (Pending, Approved, Rejected).
+Title: Title of the change (Referencing Title in the Change Requests Table).
+Description: Detailed description of the change (Referencing Description in the Change Requests Table).
+Priority: Priority level of the change (Referencing Priority in the Change Requests Table).
+RequestedBy: Reference to the user who initiated the change (Referencing RequestedBy in the Change Requests Table).
+RequestedDate: Date when the change was initially requested (Referencing RequestedDate in the Change Requests Table).
+Comments: Any comments provided during the approval process.
+ApprovalDateTime: Timestamp of the approval or rejection.
+
+3. Change History Table:
+
+ChangeHistoryID: 1
+ChangeRequestID: Reference to the associated change request (e.g., 123)
+ChangeStatus: Approved
+ResponsibleUserID: Reference to the user responsible for the approval (e.g., AdminX)
+Timestamp: 2022-01-16 14:30:00
+Comments: "Change approved by AdminX. Implementation can proceed."
+
+4. DraftID: Unique identifier for each draft.
+Title: Title of the draft change.
+Description: Detailed description of the draft change.
+Priority: Priority level of the draft change.
+RequestedBy: Reference to the user who created the draft.
+DraftStatus: Status of the draft (e.g., In Progress, Saved).
+DraftDate: Timestamp when the draft was created or last modified.

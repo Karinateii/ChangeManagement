@@ -1,0 +1,75 @@
+﻿@model Change.Models.Models.Request
+
+<form method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Request Details</h2>
+            <hr />
+        </div>
+        <div class="mb-3 row p-1">
+            <label asp-for="Title" class="p-0"></label>
+            <input asp-for="Title" class="form-control" readonly />
+        </div>
+        <div class="mb-3 row p-1">
+            <label asp-for="Description" class="p-0"></label>
+            <textarea asp-for="Description" class="form-control" readonly></textarea>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Priority"></label>
+            <input asp-for="Priority" class="form-control" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Date"></label>
+            <input asp-for="Date" class="form-control" readonly />
+        </div>
+
+        <div class="mb-3 row p-1">
+            <label asp-for="SubmittedBy"></label>
+            <input asp-for="SubmittedBy" class="form-control" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Status"></label>
+            @if (User.IsInRole("Admin"))
+            {
+                <select asp-for="Status" class="form-control">
+                    <option value="Pending" selected="@((Model.Status == "Pending") ? "selected" : null)"><text> Pending </text></option>
+                    <option value="Approved" selected="@((Model.Status == "Approved") ? "selected" : null)"><text> Approved </text></option>
+                    <option value="Not Approved" selected="@((Model.Status == "Not Approved") ? "selected" : null)"><text> Not Approved </text></option>
+                </select>
+            }
+            else
+            {
+                <input asp-for="Status" class="form-control" readonly value="@Model.Status" />
+            }
+        </div>
+
+        @if (User.IsInRole("Admin"))
+        {
+
+            <div class="mb-3">
+                <label asp-for="AdminReason">Admin Reason</label>
+                <textarea asp-for="AdminReason" class="form-control"></textarea>
+                <span asp-validation-for="AdminReason" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AdminApprovalDate">Admin Approval Date</label>
+                <input asp-for="AdminApprovalDate" class="form-control" />
+                <span asp-validation-for="AdminApprovalDate" class="text-danger"></span>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-6 col-md-3">
+                <button type="submit" class="btn btn-primary form-control">Update Status</button>
+            </div>
+            <div class="col-6 col-md-3">
+                <a asp-action="Index" class="btn btn-secondary border form-control">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</form>
