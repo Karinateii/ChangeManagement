@@ -18,8 +18,8 @@ jobs:
       
       - name: Install dependencies
         run: dotnet restore
-        working-directory: master/ChangeManagement
-        
+        working-directory: ChangeManagement
+       
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
         with:
