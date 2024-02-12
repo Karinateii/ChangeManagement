@@ -20,7 +20,7 @@ function loadDataTable() {
                 "data": requestData,
                 "columns": [
                     { data: 'Title', "width": "20%" },
-                    { data: 'Description', "width": "20%" },
+                    /*{ data: 'Description', "width": "20%" },*/
                     { data: 'Priority', "width": "10%" },
                     { data: 'Status', "width": "10%" },
                     { data: 'SubmittedBy', "width": "15%" },
@@ -32,9 +32,10 @@ function loadDataTable() {
                             <a href="/Request/Edit/${data}" class="btn btn-primary mx-2"> <i class="bi bi-binoculars-fill"></i>Details</a>
                             </div>`
                         },
-                        "width": "20%"
+                        "width": "15%"
                     }
-                ]
+                ]                      
+                    
             });
 
             console.log("DataTable initialized successfully!");
