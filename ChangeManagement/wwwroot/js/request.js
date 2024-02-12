@@ -19,11 +19,11 @@ function loadDataTable() {
             dataTable = $('#tblData').DataTable({
                 "data": requestData,
                 "columns": [
-                    { data: 'Title', "width": "20%" },
+                    { data: 'Title', "width": "25%" },
                     /*{ data: 'Description', "width": "20%" },*/
-                    { data: 'Priority', "width": "10%" },
-                    { data: 'Status', "width": "10%" },
-                    { data: 'SubmittedBy', "width": "15%" },
+                    { data: 'Priority', "width": "15%" },
+                    { data: 'Status', "width": "15%" },
+                    { data: 'SubmittedBy', "width": "30%" },
                     /*{ data: 'Date', "width": "25%" },*/
                     {
                         data: 'Id',
