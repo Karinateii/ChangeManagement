@@ -24,7 +24,7 @@ function loadDataTable() {
                     { data: 'Priority', "width": "10%" },
                     { data: 'Status', "width": "10%" },
                     { data: 'SubmittedBy', "width": "15%" },
-                    { data: 'Date', "width": "25%" },
+                    /*{ data: 'Date', "width": "25%" },*/
                     {
                         data: 'Id',
                         "render": function (data) {
