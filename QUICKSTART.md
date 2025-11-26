@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-## 🚀 Get Up and Running in 5 Minutes
+## Get Up and Running in 5 Minutes
 
 ### Step 1: Configure Secrets (2 minutes)
 
@@ -34,7 +34,7 @@ Navigate to: `https://localhost:7XXX` (check console for exact port)
 
 ---
 
-## 📋 First Login
+## First Login
 
 1. Click "Login" or navigate to `/Identity/Account/Login`
 2. Login with your configured admin credentials

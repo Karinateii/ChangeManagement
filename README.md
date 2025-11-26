@@ -1,35 +1,34 @@
 # Change Management System
 
-A professional ASP.NET Core 6.0 MVC application for managing change requests with role-based access control, secure authentication, and comprehensive logging.
+A web application for managing change requests built with ASP.NET Core 6.0 MVC, featuring role-based access control and secure authentication.
 
 ## Features
 
-### Security Features
-- ✅ **Role-Based Authorization**: Admin and Employee roles with policy-based access control
-- ✅ **Strong Password Policies**: Enforced password complexity requirements
-- ✅ **Anti-CSRF Protection**: ValidateAntiForgeryToken on all POST operations
-- ✅ **Security Headers**: XSS, clickjacking, and content-type sniffing protection
-- ✅ **Secure Cookies**: HttpOnly, Secure, and SameSite cookie attributes
-- ✅ **Input Validation**: Server-side validation with data annotations
-- ✅ **SQL Injection Protection**: Entity Framework parameterized queries
-- ✅ **Account Lockout**: Automatic lockout after failed login attempts
+### Security
+- Role-based authorization (Admin and Employee roles)
+- Strong password policies with account lockout
+- CSRF protection on all forms
+- Security headers (XSS, clickjacking, CSP protection)
+- Secure cookie configuration
+- Input validation throughout
+- Entity Framework parameterized queries
 
 ### Application Features
-- **Request Management**: Create, view, edit, and delete change requests
-- **Status Tracking**: Pending, Approved, and Not Approved statuses
-- **Priority Levels**: Low, Medium, High, and Critical prioritization
-- **Admin Approval Workflow**: Admins can approve/reject with reasons
-- **Audit Trail**: Submission date, approval date, and submitter tracking
-- **Email Notifications**: SMTP-based email sending capability
-- **Structured Logging**: Serilog with file and console output
+- Create and manage change requests
+- Track status (Pending, Approved, Rejected)
+- Priority levels (Low, Medium, High, Critical)
+- Admin approval workflow with reasons
+- Audit trail with dates and submitter info
+- Email notifications via SMTP
+- Structured logging with Serilog
 
 ## Technology Stack
 
-- **Framework**: ASP.NET Core 6.0 MVC
-- **Database**: SQL Server with Entity Framework Core 6
-- **Authentication**: ASP.NET Core Identity
-- **Logging**: Serilog
-- **Frontend**: Bootstrap 5, jQuery, DataTables
+- ASP.NET Core 6.0 MVC
+- SQL Server with Entity Framework Core 6
+- ASP.NET Core Identity
+- Serilog for logging
+- Bootstrap 5, jQuery, DataTables
 
 ## Project Structure
 
@@ -113,19 +112,19 @@ ChangeManagement/
 
 ### Password Policy
 
-The following password requirements are enforced:
+Password requirements:
 - Minimum 8 characters
 - At least 1 uppercase letter
 - At least 1 lowercase letter
 - At least 1 digit
-- At least 1 non-alphanumeric character
-- Account lockout after 5 failed attempts (15-minute lockout)
+- At least 1 special character
+- Account lockout: 5 failed attempts, 15-minute lockout
 
 ### Authorization Policies
 
-- **AdminOnly**: Requires Admin role
-- **EmployeeOnly**: Requires Employee role
-- **AdminOrEmployee**: Requires either Admin or Employee role
+- **AdminOnly**: Admin role required
+- **EmployeeOnly**: Employee role required
+- **AdminOrEmployee**: Either role accepted
 
 ### Logging
 
@@ -137,22 +136,22 @@ Log levels can be configured in `appsettings.json` under the `Serilog` section.
 
 ## Usage
 
-### Default Roles
+### Roles
 
-1. **Admin**: Full access to all features
+1. **Admin**: Full access
    - View all requests
    - Approve/reject requests
    - Delete requests
-   - Add admin reasons and approval dates
+   - Add approval reasons and dates
 
-2. **Employee**: Standard user access
+2. **Employee**: Standard access
    - Create new requests
    - View all requests
-   - Cannot approve/reject or delete requests
+   - Cannot approve/reject or delete
 
-### Creating the First Admin User
+### Admin User Setup
 
-The admin user is automatically created on first run if configured in user secrets or `appsettings.json`. See the Installation section above.
+The admin user is created automatically on first run using credentials from user secrets or appsettings.json.
 
 ### Email Notifications
 
