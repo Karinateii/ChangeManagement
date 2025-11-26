@@ -8,11 +8,8 @@ namespace Change.DataAccess.Repository.IRepository
 {
     public interface IUnitOfWork
     {
-        //ISupplierRepository Supplier { get; }
-        //ILabSupplyRepository LabSupply { get; }
-
         IRequestRepository Request { get; }
-
         void Save();
+        Task<int> SaveAsync();
     }
 }

@@ -12,147 +12,239 @@ using System.Security.Claims;
 
 namespace ChangeManagement.Controllers
 {
-    [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
-
+    [Authorize(Policy = "AdminOrEmployee")]
     public class RequestController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        //private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<RequestController> _logger;
 
-        public RequestController(IUnitOfWork unitOfWork, UserManager<ApplicationUser> userManager)
+        public RequestController(IUnitOfWork unitOfWork, ILogger<RequestController> logger)
         {
             _unitOfWork = unitOfWork;
-            //_userManager = userManager;
+            _logger = logger;
         }
 
-        // GET: Suppliers
         public IActionResult Index()
         {
-            List<Request> requestList = _unitOfWork.Request.GetAll().ToList();
-            return View(requestList);
+            try
+            {
+                List<Request> requestList = _unitOfWork.Request.GetAll().ToList();
+                return View(requestList);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving request list");
+                TempData["error"] = "An error occurred while loading requests.";
+                return View(new List<Request>());
+            }
         }
 
-        [Authorize(Roles = SD.Role_Employee)]
-        // GET: Suppliers/Create
+        [Authorize(Policy = "EmployeeOnly")]
         public IActionResult Create()
         {
             return View();
         }
 
-        [Authorize(Roles = SD.Role_Employee)]
-        // POST: Suppliers/Create
+        [Authorize(Policy = "EmployeeOnly")]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Create(Request obj)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _unitOfWork.Request.Add(obj);
-                _unitOfWork.Save();
-                TempData["success"] = "Request Created Successfully";
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    // Set default values
+                    obj.Date = DateTime.Now;
+                    obj.Status = "Pending";
+                    
+                    _unitOfWork.Request.Add(obj);
+                    _unitOfWork.Save();
+                    
+                    _logger.LogInformation("Request created successfully by {User}: {Title}", obj.SubmittedBy, obj.Title);
+                    TempData["success"] = "Request Created Successfully";
+                    return RedirectToAction("Index");
+                }
+                
+                _logger.LogWarning("Invalid model state in Create action");
+                return View(obj);
             }
-            return View();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating request");
+                TempData["error"] = "An error occurred while creating the request.";
+                return View(obj);
+            }
         }
 
-        // GET: Suppliers/Edit/5
         public IActionResult Edit(int? id)
         {
-            if (id == null)
+            if (id == null || id == 0)
             {
+                _logger.LogWarning("Edit called with null or invalid id");
                 return NotFound();
             }
-            Request? requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
-            // Supplier? supplierFromDb1 = _db.Suppliers.FirstOrDefault(u=>u.SupplierID==id);
-            // Supplier? supplierFromDb2 = _db.Suppliers.Where(u=>u.SupplierID==id).FirstOrDefault();
 
-            if (requestFromDb == null)
+            try
             {
-                return NotFound();
+                Request? requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
+                
+                if (requestFromDb == null)
+                {
+                    _logger.LogWarning("Request not found with id: {Id}", id);
+                    return NotFound();
+                }
+                
+                return View(requestFromDb);
             }
-            return View(requestFromDb);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving request for edit with id: {Id}", id);
+                TempData["error"] = "An error occurred while loading the request.";
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(Request obj)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _unitOfWork.Request.update(obj);
-                _unitOfWork.Save();
-                TempData["success"] = "Request Updated Successfully";
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    _unitOfWork.Request.update(obj);
+                    _unitOfWork.Save();
+                    
+                    _logger.LogInformation("Request updated successfully: {Id}", obj.Id);
+                    TempData["success"] = "Request Updated Successfully";
+                    return RedirectToAction("Index");
+                }
+                
+                _logger.LogWarning("Invalid model state in Edit action for request: {Id}", obj.Id);
+                return View(obj);
             }
-            return View();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating request: {Id}", obj.Id);
+                TempData["error"] = "An error occurred while updating the request.";
+                return View(obj);
+            }
         }
 
-        // GET: Suppliers/Details/5
         public IActionResult Details(int? id)
         {
-            if (id == null)
+            if (id == null || id == 0)
             {
+                _logger.LogWarning("Details called with null or invalid id");
                 return NotFound();
             }
 
-            Request requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
-
-            if (requestFromDb == null)
+            try
             {
-                return NotFound();
-            }
+                Request? requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
 
-            return View(requestFromDb);
+                if (requestFromDb == null)
+                {
+                    _logger.LogWarning("Request not found with id: {Id}", id);
+                    return NotFound();
+                }
+
+                return View(requestFromDb);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving request details with id: {Id}", id);
+                TempData["error"] = "An error occurred while loading request details.";
+                return RedirectToAction("Index");
+            }
         }
 
-        //Get Delete
+        [Authorize(Policy = "AdminOnly")]
         public IActionResult Delete(int? id)
         {
-            if (id == null)
+            if (id == null || id == 0)
             {
+                _logger.LogWarning("Delete called with null or invalid id");
                 return NotFound();
             }
-            Request? requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
 
-            if (requestFromDb == null)
+            try
             {
-                return NotFound();
+                Request? requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
+
+                if (requestFromDb == null)
+                {
+                    _logger.LogWarning("Request not found for deletion with id: {Id}", id);
+                    return NotFound();
+                }
+                
+                return View(requestFromDb);
             }
-            return View(requestFromDb);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving request for deletion with id: {Id}", id);
+                TempData["error"] = "An error occurred while loading the request.";
+                return RedirectToAction("Index");
+            }
         }
 
-        //POST Delete
+        [Authorize(Policy = "AdminOnly")]
         [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public IActionResult DeletePOST(int? id)
         {
-            Request? obj = _unitOfWork.Request.Get(u => u.Id == id);
+            if (id == null || id == 0)
             {
+                return NotFound();
+            }
+
+            try
+            {
+                Request? obj = _unitOfWork.Request.Get(u => u.Id == id);
+                
                 if (obj == null)
                 {
+                    _logger.LogWarning("Request not found for deletion with id: {Id}", id);
                     return NotFound();
                 }
 
                 _unitOfWork.Request.Remove(obj);
                 _unitOfWork.Save();
+                
+                _logger.LogInformation("Request deleted successfully: {Id}", id);
                 TempData["success"] = "Request Deleted Successfully";
                 return RedirectToAction("Index");
             }
-
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting request with id: {Id}", id);
+                TempData["error"] = "An error occurred while deleting the request.";
+                return RedirectToAction("Index");
+            }
         }
 
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll()
         {
-            List<Request> requestList = _unitOfWork.Request.GetAll().ToList();
-
-            var jsonOptions = new JsonSerializerOptions
+            try
             {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                // Add any other serialization options if needed
-            };
+                List<Request> requestList = _unitOfWork.Request.GetAll().OrderByDescending(r => r.Date).ToList();
 
-            var jsonData = JsonSerializer.Serialize(new { data = requestList }, jsonOptions);
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve,
+                    PropertyNamingPolicy = null // Keep PascalCase
+                };
 
-            return Content(jsonData, "application/json");
+                return Json(new { data = requestList }, jsonOptions);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAll API call");
+                return StatusCode(500, new { error = "An error occurred while retrieving requests." });
+            }
         }
         #endregion
     }

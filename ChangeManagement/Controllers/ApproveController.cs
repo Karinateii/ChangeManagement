@@ -9,55 +9,88 @@ using System.Text.Json;
 
 namespace ChangeManagement.Controllers
 {
-    [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
+    [Authorize(Policy = "AdminOrEmployee")]
     public class ApproveController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<ApproveController> _logger;
 
-        public ApproveController(IUnitOfWork unitOfWork)
+        public ApproveController(IUnitOfWork unitOfWork, ILogger<ApproveController> logger)
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         public IActionResult Index()
         {
-            // Retrieve only requests with "Approved" status
-            var approvedRequests = _unitOfWork.Request.GetAll().Where(r => r.Status == "Approved").ToList();
-            return View(approvedRequests);
+            try
+            {
+                var approvedRequests = _unitOfWork.Request.GetAll()
+                    .Where(r => r.Status == "Approved")
+                    .OrderByDescending(r => r.AdminApprovalDate)
+                    .ToList();
+                return View(approvedRequests);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving approved requests");
+                TempData["error"] = "An error occurred while loading approved requests.";
+                return View(new List<Request>());
+            }
         }
 
         public IActionResult Details(int? id)
         {
-            if (id == null)
+            if (id == null || id == 0)
             {
+                _logger.LogWarning("Details called with null or invalid id");
                 return NotFound();
             }
 
-            Request requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
-
-            if (requestFromDb == null)
+            try
             {
-                return NotFound();
-            }
+                Request? requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
 
-            return View(requestFromDb);
+                if (requestFromDb == null)
+                {
+                    _logger.LogWarning("Approved request not found with id: {Id}", id);
+                    return NotFound();
+                }
+
+                return View(requestFromDb);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving approved request details with id: {Id}", id);
+                TempData["error"] = "An error occurred while loading request details.";
+                return RedirectToAction("Index");
+            }
         }
 
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll()
         {
-            var approvedRequests = _unitOfWork.Request.GetAll().Where(r => r.Status == "Approved").ToList();
-
-            var jsonOptions = new JsonSerializerOptions
+            try
             {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                // Add any other serialization options if needed
-            };
+                var approvedRequests = _unitOfWork.Request.GetAll()
+                    .Where(r => r.Status == "Approved")
+                    .OrderByDescending(r => r.AdminApprovalDate)
+                    .ToList();
 
-            var jsonData = JsonSerializer.Serialize(new { data = approvedRequests }, jsonOptions);
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve
+                };
 
-            return Content(jsonData, "application/json");
+                var jsonData = JsonSerializer.Serialize(new { data = approvedRequests }, jsonOptions);
+                return Content(jsonData, "application/json");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAll API call for approved requests");
+                return StatusCode(500, new { error = "An error occurred while retrieving approved requests." });
+            }
         }
         #endregion
     }

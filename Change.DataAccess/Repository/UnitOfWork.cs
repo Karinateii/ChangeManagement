@@ -11,22 +11,23 @@ namespace Change.DataAccess.Repository
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private ApplicationDbContext _db;
-        //public ISupplierRepository Supplier { get; private set; }
+        private readonly ApplicationDbContext _db;
         public IRequestRepository Request { get; private set; }
 
         public UnitOfWork(ApplicationDbContext db)
         {
             _db = db;
-            //Supplier = new SupplierRepository(_db);
-            //LabSupply = new LabSupplyRepository(_db);
             Request = new RequestRepository(_db);
         }
-
 
         public void Save()
         {
             _db.SaveChanges();
+        }
+
+        public async Task<int> SaveAsync()
+        {
+            return await _db.SaveChangesAsync();
         }
     }
 }

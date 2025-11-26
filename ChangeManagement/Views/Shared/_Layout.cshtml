@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Synergy</title>
+    <title>@ViewData["Title"] - Change Management System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -13,36 +13,34 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-primary border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Request" asp-action="Index">SYNERGY</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Request" asp-action="Index">
+                    <i class="bi bi-lightning-charge-fill me-2"></i>
+                    <span class="fw-bold">SYNERGY</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        @*<li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>*@
                         @if (User.IsInRole("Admin") || User.IsInRole("Employee"))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Change Management
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Request" asp-action="Index">
+                                    <i class="bi bi-clipboard-check"></i> All Requests
                                 </a>
-                                <ul class="dropdown-menu">
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" asp-area="" asp-controller="Request" asp-action="Index">Change Request</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" asp-area="" asp-controller="Approve" asp-action="Index">Approved Requests</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="dropdown-item" asp-area="" asp-controller="NotApproved" asp-action="Index">UnApproved Requests</a>
-                                    </li>
-                                    <li><hr class="dropdown-divider"></li>
-                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Approve" asp-action="Index">
+                                    <i class="bi bi-check-circle"></i> Approved
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="NotApproved" asp-action="Index">
+                                    <i class="bi bi-x-circle"></i> Rejected
+                                </a>
                             </li>
                         }
                     </ul>
@@ -50,24 +48,33 @@
                 </div>
             </div>
         </nav>
-
     </header>
-    <div class="container">
+    
+    <div class="container-fluid px-0">
         <main role="main" class="pb-3">
             <partial name="_Notification" />
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer bg-primary text-muted">
-        <div class="text-center">
-             <i class="bi bi-heart-fill"></i> Synergy
+    <footer class="footer bg-primary text-white mt-5">
+        <div class="container-fluid px-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <span>&copy; @DateTime.Now.Year - Change Management System</span>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <span>Made with <i class="bi bi-heart-fill"></i> by Synergy Team</span>
+                </div>
+            </div>
         </div>
     </footer>
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="//cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" asp-append-version="true"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

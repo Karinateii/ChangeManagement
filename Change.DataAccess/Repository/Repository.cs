@@ -14,12 +14,11 @@ namespace Change.DataAccess.Repository
     {
         private readonly ApplicationDbContext _db;
         internal DbSet<T> dbSet;
+        
         public Repository(ApplicationDbContext db)
         {
             _db = db;
-            //_db.Suppliers == dbSet
             this.dbSet = _db.Set<T>();
-            //_db.LabSupplies.Include(u => u.Supplier).Include(u => u.SupplierID);
         }
 
         public void Add(T entity)
@@ -27,10 +26,16 @@ namespace Change.DataAccess.Repository
             dbSet.Add(entity);
         }
 
-        public T Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        public async Task AddAsync(T entity)
+        {
+            await dbSet.AddAsync(entity);
+        }
+
+        public T? Get(Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
             query = query.Where(filter);
+            
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -38,12 +43,30 @@ namespace Change.DataAccess.Repository
                     query = query.Include(includeProp);
                 }
             }
+            
             return query.FirstOrDefault();
+        }
+
+        public async Task<T?> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null)
+        {
+            IQueryable<T> query = dbSet;
+            query = query.Where(filter);
+            
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+            
+            return await query.FirstOrDefaultAsync();
         }
 
         public IEnumerable<T> GetAll(string? includeProperties = null)
         {
             IQueryable<T> query = dbSet;
+            
             if (!string.IsNullOrEmpty(includeProperties))
             {
                 foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -51,7 +74,23 @@ namespace Change.DataAccess.Repository
                     query = query.Include(includeProp);
                 }
             }
+            
             return query.ToList();
+        }
+
+        public async Task<IEnumerable<T>> GetAllAsync(string? includeProperties = null)
+        {
+            IQueryable<T> query = dbSet;
+            
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+            
+            return await query.ToListAsync();
         }
 
         public void Remove(T entity)

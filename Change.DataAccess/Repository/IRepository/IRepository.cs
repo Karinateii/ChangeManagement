@@ -9,20 +9,16 @@ namespace Change.DataAccess.Repository.IRepository
 {
     public interface IRepository<T> where T : class
     {
-        // T - Supplier
-        //Get All Suppliers
+        // Synchronous methods
         IEnumerable<T> GetAll(string? includeProperties = null);
-
-        //Similar to  Supplier? supplierFromDb1 = _db.Suppliers.FirstOrDefault(u=>u.SupplierID==id);
-        //Get Particular Supplier
-        T Get(Expression<Func<T, bool>> filter, string? includeProperties = null);
-
-        //Add Request
+        T? Get(Expression<Func<T, bool>> filter, string? includeProperties = null);
         void Add(T entity);
-
-        //Remove Request
         void Remove(T entity);
-
         void RemoveRange(IEnumerable<T> entity);
+
+        // Asynchronous methods
+        Task<IEnumerable<T>> GetAllAsync(string? includeProperties = null);
+        Task<T?> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null);
+        Task AddAsync(T entity);
     }
 }

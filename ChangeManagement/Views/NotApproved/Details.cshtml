@@ -1,50 +1,100 @@
 ﻿@model Change.Models.Models.Request
 
-<form method="post">
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">Not Approved Request Details</h2>
-            <hr />
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for="Title" class="p-0"></label>
-            <input asp-for="Title" class="form-control" readonly />
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for="Description" class="p-0"></label>
-            <input asp-for="Description" class="form-control" readonly />
-        </div>
-        <div class="mb-3">
-            <label asp-for="Priority"></label>
-            <input asp-for="Priority" class="form-control" readonly />
-        </div>
+@{
+    ViewData["Title"] = "Rejected Request Details";
+}
 
-        <div class="mb-3">
-            <label asp-for="Status"></label>
-            <input asp-for="Status" class="form-control" readonly />
-        </div>
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-x-circle-fill me-2"></i>Rejected Request Details
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-semibold">TITLE</label>
+                        <h5 class="fw-bold">@Model.Title</h5>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label text-muted small fw-semibold">DESCRIPTION</label>
+                        <p class="bg-light p-3 rounded">@Model.Description</p>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-semibold">
+                                <i class="bi bi-exclamation-triangle me-1"></i>PRIORITY
+                            </label>
+                            <p>
+                                <span class="badge bg-@(Model.Priority == "Critical" ? "danger" : Model.Priority == "High" ? "warning" : Model.Priority == "Medium" ? "info" : "secondary") fs-6">
+                                    @Model.Priority
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-semibold">
+                                <i class="bi bi-x-circle-fill me-1"></i>STATUS
+                            </label>
+                            <p>
+                                <span class="badge bg-danger fs-6">
+                                    <i class="bi bi-x-circle-fill me-1"></i>@Model.Status
+                                </span>
+                            </p>
+                        </div>
+                    </div>
 
-        <div class="mb-3">
-            <label asp-for="Date"></label>
-            <input asp-for="Date" class="form-control" readonly />
-        </div>
+                    <div class="row">
+                        <div class="col-12 col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-semibold">
+                                <i class="bi bi-calendar-event me-1"></i>SUBMISSION DATE
+                            </label>
+                            <p class="mb-0">@Model.Date.ToString("MMMM dd, yyyy")</p>
+                        </div>
+                        <div class="col-12 col-md-6 mb-3">
+                            <label class="form-label text-muted small fw-semibold">
+                                <i class="bi bi-calendar-x me-1"></i>REJECTION DATE
+                            </label>
+                            <p class="mb-0">@(Model.AdminApprovalDate?.ToString("MMMM dd, yyyy") ?? "N/A")</p>
+                        </div>
+                    </div>
 
-        <div class="mb-3">
-            <label asp-for="AdminApprovalDate">Admin Approval Date</label>
-            <input asp-for="AdminApprovalDate" class="form-control" readonly />
-        </div>
+                    @if (!string.IsNullOrEmpty(Model.AdminReason))
+                    {
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-semibold">
+                                <i class="bi bi-chat-quote me-1"></i>ADMIN FEEDBACK
+                            </label>
+                            <div class="alert alert-danger" role="alert">
+                                <i class="bi bi-info-circle me-2"></i>@Model.AdminReason
+                            </div>
+                        </div>
+                    }
 
-        <div class="mb-3">
-            <label asp-for="AdminReason">Admin Approval Reason</label>
-            <textarea asp-for="AdminReason" class="form-control" readonly></textarea>
-        </div>
+                    @if (!string.IsNullOrEmpty(Model.SubmittedBy))
+                    {
+                        <div class="mb-4">
+                            <label class="form-label text-muted small fw-semibold">
+                                <i class="bi bi-person-fill me-1"></i>SUBMITTED BY
+                            </label>
+                            <p class="mb-0">@Model.SubmittedBy</p>
+                        </div>
+                    }
 
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <a asp-action="Index" class="btn btn-secondary border form-control">
-                    Back to List
-                </a>
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-12 col-sm-6 col-md-4">
+                            <a asp-action="Index" class="btn btn-outline-secondary btn-lg w-100">
+                                <i class="bi bi-arrow-left me-2"></i>Back to List
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</form>
+</div>

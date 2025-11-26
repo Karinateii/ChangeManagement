@@ -6,39 +6,74 @@ $(document).ready(function () {
 
 function loadDataTable() {
     $.ajax({
-        url: '/NotApproved/getall', // Replace with your actual URL
+        url: '/NotApproved/getall',
         type: 'GET',
         dataType: 'json',
         success: function (data) {
             console.log("Received JSON data:", data);
 
-            // Extract the relevant data values
             const requestData = data.data.$values;
 
-            // Use 'requestData' as the source for the DataTable
             dataTable = $('#tblData').DataTable({
                 "data": requestData,
                 "columns": [
-                    { data: 'Title', "width": "20%" },
-                    { data: 'Status', "width": "10%" },
-                    { data: 'Date', "width": "25%" },
-                    { data: 'AdminApprovalDate', "width": "15%" },
+                    { 
+                        data: 'Title', 
+                        "width": "30%",
+                        "render": function(data) {
+                            return `<strong>${data}</strong>`;
+                        }
+                    },
+                    { 
+                        data: 'Status', 
+                        "width": "15%",
+                        "render": function(data) {
+                            return `<span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> ${data}</span>`;
+                        }
+                    },
+                    { 
+                        data: 'Date', 
+                        "width": "20%",
+                        "render": function(data) {
+                            return `<i class="bi bi-calendar-event text-info"></i> ${new Date(data).toLocaleDateString()}`;
+                        }
+                    },
+                    { 
+                        data: 'AdminApprovalDate', 
+                        "width": "20%",
+                        "render": function(data) {
+                            return data ? `<i class="bi bi-calendar-x text-danger"></i> ${new Date(data).toLocaleDateString()}` : '-';
+                        }
+                    },
                     {
                         data: 'Id',
                         "render": function (data) {
-                            return `<div class="w-75 btn-group" role="group">
-                            <a href="/NotApproved/Details/${data}" class="btn btn-primary mx-2"> <i class="bi bi-binoculars-fill"></i>Details</a>
-                            </div>`
+                            return `<div class="text-center">
+                                <a href="/NotApproved/Details/${data}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-eye-fill"></i> Details
+                                </a>
+                            </div>`;
                         },
-                        "width": "20%"
+                        "width": "15%",
+                        "orderable": false
                     }
-                ]
+                ],
+                "order": [[2, 'desc']],
+                "pageLength": 10,
+                "responsive": true,
+                "language": {
+                    "emptyTable": "No rejected change requests available",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ requests",
+                    "search": "Search:",
+                    "lengthMenu": "Show _MENU_ requests per page"
+                }
             });
 
             console.log("DataTable initialized successfully!");
         },
         error: function (error) {
             console.error("Error fetching data:", error);
+            toastr.error('Failed to load rejected requests. Please refresh the page.');
         }
     });
 }

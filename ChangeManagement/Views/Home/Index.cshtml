@@ -1,1 +1,299 @@
-﻿
+﻿@model IEnumerable<Request>
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container-fluid px-4 py-5">
+    <div class="row justify-content-center mb-5">
+        <div class="col-12 col-lg-10 text-center">
+            <div class="hero-section p-5 bg-gradient rounded-3 shadow-sm">
+                <i class="bi bi-gear-wide-connected text-primary display-1 mb-4"></i>
+                <h1 class="display-4 fw-bold mb-3">Change Management System</h1>
+                <p class="lead text-muted mb-4">
+                    Streamline your organization's change processes with our comprehensive management platform.
+                    Submit, track, and manage change requests efficiently.
+                </p>
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    if (User.IsInRole("Employee"))
+                    {
+                        <a asp-controller="Request" asp-action="Create" class="btn btn-primary btn-lg me-2">
+                            <i class="bi bi-plus-circle-fill me-2"></i>Create New Request
+                        </a>
+                    }
+                    <a asp-controller="Request" asp-action="Index" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-list-ul me-2"></i>View All Requests
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn-lg me-2">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+                    </a>
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-primary btn-lg">
+                        <i class="bi bi-person-plus me-2"></i>Register
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="row g-4 mb-5">
+            <div class="col-12 col-md-6 col-lg-3">
+                <div class="card text-center h-100 shadow-sm hover-lift">
+                    <div class="card-body">
+                        <i class="bi bi-file-earmark-text text-primary display-4 mb-3"></i>
+                        <h5 class="card-title">All Requests</h5>
+                        <p class="card-text text-muted">View and manage all change requests</p>
+                        <a asp-controller="Request" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                            View <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card text-center h-100 shadow-sm hover-lift">
+                        <div class="card-body">
+                            <i class="bi bi-check-circle text-success display-4 mb-3"></i>
+                            <h5 class="card-title">Approved</h5>
+                            <p class="card-text text-muted">Review approved change requests</p>
+                            <a asp-controller="Approve" asp-action="Index" class="btn btn-sm btn-outline-success">
+                                View <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card text-center h-100 shadow-sm hover-lift">
+                        <div class="card-body">
+                            <i class="bi bi-x-circle text-danger display-4 mb-3"></i>
+                            <h5 class="card-title">Rejected</h5>
+                            <p class="card-text text-muted">Review rejected change requests</p>
+                            <a asp-controller="NotApproved" asp-action="Index" class="btn btn-sm btn-outline-danger">
+                                View <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (User.IsInRole("Employee"))
+            {
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card text-center h-100 shadow-sm hover-lift">
+                        <div class="card-body">
+                            <i class="bi bi-plus-circle text-info display-4 mb-3"></i>
+                            <h5 class="card-title">New Request</h5>
+                            <p class="card-text text-muted">Submit a new change request</p>
+                            <a asp-controller="Request" asp-action="Create" class="btn btn-sm btn-outline-info">
+                                Create <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-lg-8 mx-auto">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="card-title mb-3">
+                            <i class="bi bi-info-circle text-primary me-2"></i>How It Works
+                        </h5>
+                        <div class="row g-4">
+                            <div class="col-12 col-md-4">
+                                <div class="text-center">
+                                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <strong class="text-primary fs-4">1</strong>
+                                    </div>
+                                    <h6 class="fw-semibold">Submit Request</h6>
+                                    <p class="text-muted small">Create a new change request with detailed information</p>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="text-center">
+                                    <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <strong class="text-warning fs-4">2</strong>
+                                    </div>
+                                    <h6 class="fw-semibold">Admin Review</h6>
+                                    <p class="text-muted small">Administrator reviews and evaluates the request</p>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="text-center">
+                                    <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                        <strong class="text-success fs-4">3</strong>
+                                    </div>
+                                    <h6 class="fw-semibold">Decision</h6>
+                                    <p class="text-muted small">Request is approved or rejected with feedback</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="row mt-5">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white border-bottom">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-clock-history text-primary me-2"></i>Recent Requests
+                                </h5>
+                                <a asp-controller="Request" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                                    View All <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Status</th>
+                                            <th>Priority</th>
+                                            <th>Date</th>
+                                            <th>Submitted By</th>
+                                            <th class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var request in Model)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <strong>@request.Title</strong>
+                                                </td>
+                                                <td>
+                                                    @if (request.Status == "Approved")
+                                                    {
+                                                        <span class="badge bg-success">
+                                                            <i class="bi bi-check-circle-fill"></i> @request.Status
+                                                        </span>
+                                                    }
+                                                    else if (request.Status == "Not Approved")
+                                                    {
+                                                        <span class="badge bg-danger">
+                                                            <i class="bi bi-x-circle-fill"></i> @request.Status
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning">
+                                                            <i class="bi bi-clock-fill"></i> @request.Status
+                                                        </span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (request.Priority == "Critical")
+                                                    {
+                                                        <span class="text-danger fw-semibold">
+                                                            <i class="bi bi-exclamation-triangle-fill"></i> @request.Priority
+                                                        </span>
+                                                    }
+                                                    else if (request.Priority == "High")
+                                                    {
+                                                        <span class="text-warning fw-semibold">
+                                                            <i class="bi bi-arrow-up-circle-fill"></i> @request.Priority
+                                                        </span>
+                                                    }
+                                                    else if (request.Priority == "Medium")
+                                                    {
+                                                        <span class="text-info fw-semibold">
+                                                            <i class="bi bi-dash-circle-fill"></i> @request.Priority
+                                                        </span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-secondary fw-semibold">
+                                                            <i class="bi bi-arrow-down-circle-fill"></i> @request.Priority
+                                                        </span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">
+                                                        <i class="bi bi-calendar-event"></i> @request.Date.ToString("MMM dd, yyyy")
+                                                    </small>
+                                                </td>
+                                                <td>
+                                                    <small>
+                                                        <i class="bi bi-person-fill text-info"></i> @request.SubmittedBy
+                                                    </small>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a asp-controller="Request" asp-action="Edit" asp-route-id="@request.Id" class="btn btn-sm btn-outline-primary">
+                                                        <i class="bi bi-eye"></i> View
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="row g-4">
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-shield-check text-success display-4 mb-3"></i>
+                        <h5 class="card-title">Secure</h5>
+                        <p class="card-text text-muted">Enterprise-grade security with role-based access control</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-lightning-charge text-warning display-4 mb-3"></i>
+                        <h5 class="card-title">Fast</h5>
+                        <p class="card-text text-muted">Quick request submission and processing workflows</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <i class="bi bi-graph-up text-info display-4 mb-3"></i>
+                        <h5 class="card-title">Efficient</h5>
+                        <p class="card-text text-muted">Streamlined processes for better productivity</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
+    
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,0.15) !important;
+    }
+</style>

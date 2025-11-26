@@ -3,62 +3,85 @@
 
 @model Request
 
+@{
+    ViewData["Title"] = "Create Change Request";
+}
 
-<form method="post">
-    <div class="border p-3 mt-4">
-        <div class="row pb-2">
-            <h2 class="text-primary">Create Request</h2>
-            <hr />
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for="Title" class="p-0"></label>
-            <input asp-for="Title" class="form-control" />
-            <span asp-validation-for="Title" class="text-danger"></span>
+<div class="container-fluid px-4 py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Create New Change Request
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" asp-action="Create" asp-controller="Request">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="Title" class="form-label fw-semibold">
+                                <i class="bi bi-card-heading text-primary me-1"></i>Title
+                            </label>
+                            <input asp-for="Title" class="form-control form-control-lg" maxlength="200" placeholder="Enter a descriptive title" required />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="Description" class="form-label fw-semibold">
+                                <i class="bi bi-text-paragraph text-primary me-1"></i>Description
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="6" maxlength="2000" placeholder="Provide detailed information about the change request" required></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <small class="text-muted">Maximum 2000 characters</small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label asp-for="Priority" class="form-label fw-semibold">
+                                <i class="bi bi-exclamation-triangle text-warning me-1"></i>Priority
+                            </label>
+                            <select asp-for="Priority" class="form-select form-select-lg" required>
+                                <option value="">-- Select Priority Level --</option>
+                                <option value="Low">🟢 Low</option>
+                                <option value="Medium" selected>🟡 Medium</option>
+                                <option value="High">🟠 High</option>
+                                <option value="Critical">🔴 Critical</option>
+                            </select>
+                            <span asp-validation-for="Priority" class="text-danger"></span>
+                        </div>
 
-        </div>
-        <div class="mb-3 row p-1">
-            <label asp-for="Description" class="p-0"></label>
-            <input asp-for="Description" class="form-control" />
-            <span asp-validation-for="Description" class="text-danger"></span>
+                        <input type="hidden" asp-for="SubmittedBy" value="@GetUserName()">
 
-        </div>
-        <div class="mb-3">
-            <label asp-for="Priority"></label>
-            <input asp-for="Priority" class="form-control" />
-            <span asp-validation-for="Priority" class="text-danger"></span>
-        </div>
-        <div class="mb-3">
-            <label asp-for="Date"></label>
-            <input asp-for="Date" class="form-control" />
-            <span asp-validation-for="Date" class="text-danger"></span>
-        </div>
+                        @functions {
+                            private string GetUserName()
+                            {
+                                var user = UserManager.FindByNameAsync(User.Identity?.Name ?? string.Empty).Result;
+                                return user?.Name ?? "Unknown User";
+                            }
+                        }
 
-        <!-- Add a hidden field for the user's name -->
-        <input type="hidden" asp-for="SubmittedBy" value="@GetUserName()">
-
-        @functions {
-            private string GetUserName()
-            {
-                //var user = await UserManager.FindByNameAsync(User.Identity.Name);
-                var user = UserManager.FindByNameAsync(User.Identity.Name).Result;
-                return user?.Name;
-            }
-        }
-
-
-        <div class="row">
-            <div class="col-6 col-md-3">
-                <button type="submit" class="btn btn-primary form-control">Create</button>
+                        <hr class="my-4">
+                        
+                        <div class="row g-3">
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="bi bi-check-circle-fill me-2"></i>Create Request
+                                </button>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-4">
+                                <a asp-controller="Request" asp-action="Index" class="btn btn-outline-secondary btn-lg w-100">
+                                    <i class="bi bi-arrow-left me-2"></i>Back to List
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="col-6 col-md-3">
-                <a asp-controller="Request" asp-action="Index" class="btn btn-secondary border form-control">
-                    Back to List
-                </a>
-            </div>
         </div>
-
     </div>
-</form>
+</div>
 
 @section Scripts{
     @{

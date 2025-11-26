@@ -10,55 +10,88 @@ using System.Text.Json;
 
 namespace ChangeManagement.Controllers
 {
-    [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
+    [Authorize(Policy = "AdminOrEmployee")]
     public class NotApprovedController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<NotApprovedController> _logger;
 
-        public NotApprovedController(IUnitOfWork unitOfWork)
+        public NotApprovedController(IUnitOfWork unitOfWork, ILogger<NotApprovedController> logger)
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         public IActionResult Index()
         {
-            // Retrieve only requests with "Not Approved" status
-            var notApprovedRequests = _unitOfWork.Request.GetAll().Where(r => r.Status == "Not Approved").ToList();
-            return View(notApprovedRequests);
+            try
+            {
+                var notApprovedRequests = _unitOfWork.Request.GetAll()
+                    .Where(r => r.Status == "Not Approved")
+                    .OrderByDescending(r => r.AdminApprovalDate)
+                    .ToList();
+                return View(notApprovedRequests);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving not approved requests");
+                TempData["error"] = "An error occurred while loading not approved requests.";
+                return View(new List<Request>());
+            }
         }
 
         public IActionResult Details(int? id)
         {
-            if (id == null)
+            if (id == null || id == 0)
             {
+                _logger.LogWarning("Details called with null or invalid id");
                 return NotFound();
             }
 
-            Request requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
-
-            if (requestFromDb == null)
+            try
             {
-                return NotFound();
-            }
+                Request? requestFromDb = _unitOfWork.Request.Get(u => u.Id == id);
 
-            return View(requestFromDb);
+                if (requestFromDb == null)
+                {
+                    _logger.LogWarning("Not approved request not found with id: {Id}", id);
+                    return NotFound();
+                }
+
+                return View(requestFromDb);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving not approved request details with id: {Id}", id);
+                TempData["error"] = "An error occurred while loading request details.";
+                return RedirectToAction("Index");
+            }
         }
 
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll()
         {
-            var notApprovedRequests = _unitOfWork.Request.GetAll().Where(r => r.Status == "Not Approved").ToList();
-
-            var jsonOptions = new JsonSerializerOptions
+            try
             {
-                ReferenceHandler = ReferenceHandler.Preserve,
-                // Add any other serialization options if needed
-            };
+                var notApprovedRequests = _unitOfWork.Request.GetAll()
+                    .Where(r => r.Status == "Not Approved")
+                    .OrderByDescending(r => r.AdminApprovalDate)
+                    .ToList();
 
-            var jsonData = JsonSerializer.Serialize(new { data = notApprovedRequests }, jsonOptions);
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    ReferenceHandler = ReferenceHandler.Preserve
+                };
 
-            return Content(jsonData, "application/json");
+                var jsonData = JsonSerializer.Serialize(new { data = notApprovedRequests }, jsonOptions);
+                return Content(jsonData, "application/json");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAll API call for not approved requests");
+                return StatusCode(500, new { error = "An error occurred while retrieving not approved requests." });
+            }
         }
         #endregion
     }
