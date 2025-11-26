@@ -9,11 +9,23 @@ A secure, enterprise-grade web application for managing organizational change re
 
 ## 📸 Screenshots
 
-![Dashboard](https://via.placeholder.com/800x400/0d6efd/ffffff?text=Change+Management+Dashboard)
+![Login Page](docs/images/Login.png)
+*Secure login with ASP.NET Core Identity*
+
+![Dashboard](docs/images/Dashboard.png)
 *Main dashboard showing all change requests*
 
-![Request Form](https://via.placeholder.com/800x400/198754/ffffff?text=New+Request+Form)
-*Create new change request form*
+![Request List](docs/images/ViewRequests.png)
+*View all requests with DataTables integration*
+
+![Create Request Form](docs/images/Create%20Request.png)
+*Create new change request form with validation*
+
+![Dashboard Analytics](docs/images/Dashboard%202.png)
+*Dashboard with request statistics*
+
+![Admin Dashboard](docs/images/Dashboard%203.png)
+*Admin view with approval management*
 
 ## ✨ Features
 
