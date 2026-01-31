@@ -369,4 +369,4 @@ secrets.json
 
 # Serilog Logs
 logs/
-*.log
+*.logchangemanagement.db
