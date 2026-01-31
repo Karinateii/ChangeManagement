@@ -29,7 +29,7 @@ try
     builder.Services.AddControllersWithViews();
     
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
     // Configure Identity with stronger password policies
     builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -123,6 +123,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     
+    ApplyMigrations();
     SeedDatabase();
     
     app.MapRazorPages();
@@ -131,6 +132,15 @@ try
         pattern: "{controller=Home}/{action=Index}/{id?}");
 
     app.Run();
+
+    void ApplyMigrations()
+    {
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            context.Database.EnsureCreated();
+        }
+    }
 
     void SeedDatabase()
     {
